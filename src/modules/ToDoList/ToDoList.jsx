@@ -1,30 +1,60 @@
-import { Box, Button, LinearProgress, Typography } from "@mui/joy";
-import React from "react";
+import React, { useState } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
-import ToDoItem from "../ToDoItem/ToDoItem";
 import { addTodo } from "../../redux/actions";
 
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { Box, Button, LinearProgress, Typography } from "@mui/joy";
+
+import ToDoItem from "../ToDoItem/ToDoItem";
+
 function ToDoList() {
+  const isMobile = useMediaQuery("(max-width:600px)");
   const dispatch = useDispatch();
   const list = useSelector((state) => state.ToDoListReducer.list);
   const completedCount = useSelector(
     (state) => state.ToDoListReducer.completedCount
   );
   const totalCount = list.length;
-
   const progress = totalCount === 0 ? 0 : (completedCount / totalCount) * 100;
+
+  const [sortingType, setSortingType] = useState("All");
+
+  const FILTER_MAP = {
+    All: () => true,
+    Done: (item) => item.completed,
+    ToDo: (item) => !item.completed,
+  };
+
+  const filteredList = list.filter(FILTER_MAP[sortingType]);
+
+  const handleSorting = (type) => {
+    setSortingType(type);
+  };
 
   return (
     <Box
       sx={{
         justifyContent: "center",
         display: "flex",
-        width: "80%",
+        width: isMobile ? "100%" : "85%",
         margin: "auto",
         flexDirection: "column",
       }}
     >
-      {list.map((item, index) => (
+      <Box sx={{ marginBottom: "10px" }}>
+        {Object.keys(FILTER_MAP).map((type) => (
+          <Button
+            key={type}
+            sx={{ marginRight: "5px" }}
+            onClick={() => handleSorting(type)}
+          >
+            {type}
+          </Button>
+        ))}
+      </Box>
+
+      {filteredList.map((item, index) => (
         <ToDoItem key={index} index={index} item={item} />
       ))}
       <LinearProgress
@@ -50,7 +80,12 @@ function ToDoList() {
           DONE... {`${Math.round(progress)}%`}
         </Typography>
       </LinearProgress>
-      <Button sx={{marginTop:"10px"}} onClick={() => dispatch(addTodo("content"))}>+</Button>
+      <Button
+        sx={{ marginTop: "10px" }}
+        onClick={() => dispatch(addTodo("content"))}
+      >
+        +
+      </Button>
     </Box>
   );
 }

@@ -1,14 +1,12 @@
-import './App.css';
-import ToDoList from './modules/ToDoList/ToDoList';
+import "./App.css";
+import ToDoList from "./modules/ToDoList/ToDoList";
 
 function App() {
   return (
-      <div>
-        <ToDoList/>
-      </div>
+    <div className="App">
+      <ToDoList />
+    </div>
   );
 }
 
 export default App;
-
-
